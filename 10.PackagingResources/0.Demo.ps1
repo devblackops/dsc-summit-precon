@@ -1,5 +1,7 @@
 ﻿# 1. Set directory location for demo files
-Set-Location -Path C:\Scripts\DSCPreCon\10.PackagingResources
+$editor=&{ if (get-command -Name code-insiders.cmd) { 'code-insiders.cmd' } else { 'ISE' }}
+
+Set-Location -Path $PSScriptRoot
 Remove-Item -Path .\*.mof -Force
 Remove-Item -Path .\*.checksum -Force
 Remove-Item -Path .\*.zip -Force
@@ -11,7 +13,7 @@ Add-DnsServerResourceRecordA -ComputerName dc -name MyWeb -ZoneName Company.pri 
 Add-DnsServerResourceRecordA -ComputerName dc -name PSWA -ZoneName Company.pri -IPv4Address 192.168.3.52
 
 # Here is a quick config - this is cool - but notice RED SQIGGLIES!
-ISE .\1.Config_Web_MultiSite_Allnodes.ps1
+&$editor '.\1.Config_Web_MultiSite_Allnodes.ps1'
 
 # The author box needs the resources for development
 Explorer .\
@@ -21,7 +23,7 @@ copy-item -Path .\xWebAdministration -Destination 'C:\Program Files\WindowsPower
 copy-item -Path .\PSWAAuthorization -Destination 'C:\Program Files\WindowsPowerShell\Modules' -Recurse -Force
 
 # Now the config should be fine -- Run - dont show much yet - just idea
-ISE .\1.Config_Web_MultiSite_Allnodes.ps1
+&$editor '.\1.Config_Web_MultiSite_Allnodes.ps1'
 
 # Rename MOf with Guid
 Rename-Item -Path .\s1.company.pri.mof -NewName ".\RoleWeb.mof" -Force 
@@ -40,7 +42,7 @@ Explorer '\\dc\C$\Program Files\WindowsPowerShell\DscService\Configuration'
 
 # Bundle the Resources
 # THIS IS IMPORTANT - YOU NEED THE VERSION NUMBER FROM THE MANIFEST!!!
-ISE .\PSWAAuthorization\PSWAAuthorization.psd1
+&$editor '.\PSWAAuthorization\PSWAAuthorization.psd1'
 
 # Now -- ZIP IT! name + version - Module_1.0.zip
 Compress-Archive -Path .\PSWAAuthorization\* -DestinationPath .\PSWAAuthorization_1.2.0.0.zip -Force
@@ -65,7 +67,7 @@ Explorer '\\dc\C$\Program Files\WindowsPowerShell\DscService\Modules'
 # Well- now we are ready to set the LCM on the Nodes and test!
 # But I HAVE A NEW LCM THAT IS BETTER AND EASIER FOR MULTI NODES
 
-ISE .\3.New_LCM.ps1
+&$editor '.\3.New_LCM.ps1'
 
 # Cool way to grab multiple LCM configs and send -- you should make a function out of this
 $ComputerName=Get-ChildItem -Path .\*.meta.mof | Select-Object -ExpandProperty Name | ForEach-Object {$_.trim(".meta.mof")}
@@ -86,4 +88,4 @@ Start-Process -Filepath iexplore http://MyWeb.company.pri
 Start-Process -Filepath iexplore https://pswa.company.pri
 
 # Wanna see the cool config?
-ISE .\1.Config_Web_MultiSite_Allnodes.ps1
+&$editor '.\1.Config_Web_MultiSite_Allnodes.ps1'

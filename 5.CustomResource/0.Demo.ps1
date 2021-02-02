@@ -1,5 +1,7 @@
 ﻿# 1. Set directory location for demo files
-Set-Location -Path C:\Scripts\DSCPreCon\5.CustomResource
+$editor=&{ if (get-command -Name code-insiders.cmd) { 'code-insiders.cmd' } else { 'ISE' }}
+
+Set-Location -Path $PSScriptRoot
 Remove-Item -path 'C:\Program Files\WindowsPowerShell\Modules\ControlService' -Recurse -Force
 Remove-Item .\controlservice -Recurse -Force
 Remove-Item -Path .\*.mof -Force
@@ -7,13 +9,13 @@ Remove-DscConfigurationDocument -CimSession Client -Stage current
 Break
 
 # First - there is a snippet
-ISE .\Snippet.ps1
+&$editor '.\Snippet.ps1'
 
 # Now, for a simple class
-ISE .\ControlService.ps1
+&$editor '.\ControlService.ps1'
 
 # You should also make an about_ help file
-ISE .\About_ControlService.help.txt
+&$editor '.\About_ControlService.help.txt'
 
 # To package the class, you need to put it in a folder
 New-Item .\ControlService -ItemType Directory
@@ -29,11 +31,11 @@ New-ModuleManifest -Path .\ControlService\Controlservice.psd1 -RootModule Contro
     -Description 'My Test Service Class' -DscResourcesToExport 'ControlService' 
 
 # Wanna see the manifest?
-ISE .\ControlService\Controlservice.psd1
+&$editor '.\ControlService\Controlservice.psd1'
 Explorer .\ControlService
 
 # Now, write a config - but wait -- RED SQIGGLY LINES!
-ISE .\Config_Service.ps1
+&$editor '.\Config_Service.ps1'
 
 #Copy new resource to authoring computer -- and target if not using pull Server
 New-Item -path 'C:\Program Files\WindowsPowerShell\Modules\ControlService' -ItemType directory -Force
@@ -45,7 +47,7 @@ Get-DscResource
 Get-Help About_Controlservice
 
 # Open config again and run
-ISE .\Config_Service.ps1 # AND RUN IT!
+&$editor '.\Config_Service.ps1' # AND RUN IT!
 
 # Let's try!
 Invoke-Command -ComputerName Client {Stop-service -name bits}

@@ -1,5 +1,7 @@
 ﻿# 1. Set directory location for demo files
-Set-Location -Path C:\Scripts\DSCPreCon\3.Resources
+$editor=&{ if (get-command -Name code-insiders.cmd) { 'code-insiders.cmd' } else { 'ISE' }}
+
+Set-Location -Path $PSScriptRoot
 Remove-Item -Path .\*.mof -Force
 Break
 
@@ -10,8 +12,8 @@ Get-DscResource -Name WindowsProcess | Select-Object -ExpandProperty properties
 Get-DscResource -name WindowsProcess -Syntax # Show in ISE
 
 # Here's the configuration using the resource
-ISE .\1.Config-Process.ps1
-ISE .\Client.mof
+&$editor '.\1.Config-Process.ps1'
+&$editor '.\Client.mof'
 
 # Let's try it on the Client
 Start-DscConfiguration -Path .\ -ComputerName Client -Verbose -Wait
@@ -51,7 +53,7 @@ Update-Module -Name xActiveDirectory # Easy to update
 # Make a config using the new resource
 Get-DscResource -Name xADDomainController | Select-Object -ExpandProperty properties
 
-ISE .\2.Config-DomainController.ps1
+&$editor '.\2.Config-DomainController.ps1'
 
 # Test it! And configure a new one - This is going to fail!
 Get-ADDomainController -Discover

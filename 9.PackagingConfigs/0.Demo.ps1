@@ -1,5 +1,7 @@
 ﻿# 1. Set directory location for demo files
-Set-Location -Path C:\Scripts\DSCPreCon\9.PackagingConfigs
+$editor=&{ if (get-command -Name code-insiders.cmd) { 'code-insiders.cmd' } else { 'ISE' }}
+
+Set-Location -Path $PSScriptRoot
 Remove-Item -Path .\*.mof -Force
 Remove-Item -Path .\*.checksum -Force
 Remove-Item -Path .\SMTP -Recurse -Force
@@ -9,8 +11,8 @@ Invoke-Command -ComputerName dc {remove-Item -Path "c:\Program Files\WindowsPowe
 Break
 
 #Let's take a look at the LCM GUID configuration
-ISE .\1.LCM_GUID.ps1
-ISE .\s1.meta.mof
+&$editor '.\1.LCM_GUID.ps1'
+&$editor '.\s1.meta.mof'
 
 # Send to computers LCM
 Set-DSCLocalConfigurationManager -ComputerName s1 -Path .\ –Verbose
@@ -18,8 +20,8 @@ Get-DscLocalConfigurationManager -CimSession s1
 Get-DscLocalConfigurationManager -CimSession s1 | Select-Object -ExpandProperty ConfigurationDownloadManagers
 
 # Here is a quick config for installing SMTP
-ISE .\2.Config_SNMP.ps1
-ISE .\S1.mof
+&$editor '.\2.Config_SNMP.ps1'
+&$editor '.\S1.mof'
 
 # Now, we much put the files on teh Pull server
 # But we need to name them with a special name - the GUID
@@ -35,7 +37,7 @@ New-DSCChecksum -Path ".\$guid.mof" -Force
 
 # Here's what we got
 Explorer .\
-ISE ".\$guid.mof.checksum"
+&$editor ".\$guid.mof.checksum"
 Get-MYFileHash -Path ".\$Guid.mof.Checksum" | Format-Table -Property Algorithm, Hash
 
 # Now, Copy Config and Checksum to Pull Servers
@@ -52,7 +54,7 @@ Get-WindowsFeature -ComputerName s1 -name *SMTP*
 # Another Way -- Using Configuration Names
 
 # First, lets make another config, checksum and save on Pull server
-ISE .\2.Config_SNMP.ps1
+&$editor '.\2.Config_SNMP.ps1'
 
 # Rename MOf To a Role
 Rename-Item -Path .\S1.mof -NewName ".\RoleSNMP.mof" -Force 
@@ -76,7 +78,7 @@ Copy-item -path .\RegistrationKeys.txt -Destination "\\dc\c$\Program Files\Windo
 Explorer "\\dc\c$\Program Files\WindowsPowerShell\DscService"
 
 # Config the LCM
-ISE .\3.LCM_ConfigName.ps1
+&$editor '.\3.LCM_ConfigName.ps1'
 Set-DscLocalConfigurationManager -path .\ -ComputerName s2 -Verbose 
 
 # WE can wait - or force the target to get the config

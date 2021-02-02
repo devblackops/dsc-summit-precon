@@ -1,5 +1,7 @@
 ﻿# 1. Set directory location for demo files
-Set-Location -Path C:\Scripts\DSCPreCon\2.LCM
+$editor=&{ if (get-command -Name code-insiders.cmd) { 'code-insiders.cmd' } else { 'ISE' }}
+
+Set-Location -Path $PSScriptRoot
 Remove-Item -Path .\*.mof -Force
 Break
 
@@ -13,10 +15,10 @@ Get-DscLocalConfigurationManager -CimSession s1
 #        - RebootNodeIfNeeded - REfreshMode
 
 # Let's change the LCM to AutoCorrect
-ise .\1.LCM_Settings.ps1 
+&$editor '.\1.LCM_Settings.ps1'
  
 # Wanna see the MOF? - nah -- who cares
-ise .\s1.meta.mof 
+&$editor '.\s1.meta.mof'
 
 # Set the LCM on two remote targets
 Set-DSCLocalConfigurationManager -ComputerName S1,s2 -Path .\ –Verbose
@@ -26,7 +28,7 @@ Get-DscLocalConfigurationManager -CimSession s1
 
 # So, let write a DSC config - installing software (Backup)
 Get-WindowsFeature -ComputerName s1 -Name *Backup*
-ISE .\2.Config-Install-Backup.ps1
+&$editor '.\2.Config-Install-Backup.ps1'
 
 # Deploy the config
 Start-DscConfiguration -ComputerName s1 -Path .\ -Verbose -Wait
@@ -57,7 +59,7 @@ Restart-Computer -ComputerName s1 -Wait -Force
 Get-WindowsFeature -ComputerName s1 -name *backup*
 
 # The CORRECT way is to change the config
-ISE .\3.Config-Remove-Backup.ps1
+&$editor '.\3.Config-Remove-Backup.ps1'
 
 ######################################################################
 

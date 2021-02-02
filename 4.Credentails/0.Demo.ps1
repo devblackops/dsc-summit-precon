@@ -1,20 +1,22 @@
 ﻿# 1. Set directory location for demo files
-Set-Location -Path C:\Scripts\DSCPreCon\4.Credentails
+$editor=&{ if (get-command -Name code-insiders.cmd) { 'code-insiders.cmd' } else { 'ISE' }}
+
+Set-Location -Path $PSScriptRoot
 Remove-Item -Path .\*.mof -Force
 invoke-command -computername s2, client {remove-Item c:\cert -Recurse -Force}
 Invoke-Command -Computername s2, client {Remove-Item -Path Cert:\LocalMachine\my\* -Recurse -Force}
 Break
 
 # So, there is a problem when using credentials
-ISE .\1.Config_Credentials.ps1 #Run - and it fails - note error message
+&$editor '.\1.Config_Credentials.ps1' #Run - and it fails - note error message
 
 # So, let's fix -- the wrong way
-ISE .\2.Config_Credentials.ps1
-ISE .\s2.mof
+&$editor '.\2.Config_Credentials.ps1'
+&$editor '.\s2.mof'
 
 # Remeber that domain controller config? Here's the MOF
-ISE .\x.Config-DomainController.ps1
-ISE .\x.DomainControllerS1.mof.txt
+&$editor '.\x.Config-DomainController.ps1'
+&$editor '.\x.DomainControllerS1.mof.txt'
 
 <# ok, so let's do this - first - you will need
 A ADCS CA with the certificate enrollment policy web service
@@ -64,14 +66,14 @@ copy-item -Path \\s2\c$\cert\* -Destination C:\cert -Recurse -Force
 Import-Certificate -FilePath c:\cert\clientauth.cer -CertStoreLocation Cert:\LocalMachine\my
 
 # Now - configure LCM on targets with the Cert Thumbprint
-ISE .\4.LCM.ps1
-ISE .\s2.meta.mof
+&$editor '.\4.LCM.ps1'
+&$editor '.\s2.meta.mof'
 Set-DSCLocalConfigurationManager -ComputerName s2 -Path .\ –Verbose 
 
 # And at last - send the config
-ISE .\3.Config_Credentials.ps1
+&$editor '.\3.Config_Credentials.ps1'
 Invoke-Command -computername s2 {Get-ChildItem -Path cert:\localMachine\my | Where-Object {$_.EnhancedKeyUsageList -like "*Document Encryption*"} | Select-Object -Property ThumbPrint}
-ISE .\s2.mof
+&$editor '.\s2.mof'
 
 # Do Not run UNLESS using the official WMF 5 release 
 # http://stackoverflow.com/questions/34006865/dsc-problems-with-credentials-and-build-10586

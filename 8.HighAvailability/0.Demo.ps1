@@ -1,5 +1,7 @@
 ﻿# 1. Set directory location for demo files
-Set-Location -Path C:\Scripts\DSCPreCon\8.HighAvailability
+$editor=&{ if (get-command -Name code-insiders.cmd) { 'code-insiders.cmd' } else { 'ISE' }}
+
+Set-Location -Path $PSScriptRoot
 Remove-Item -Path .\*.mof -Force
 Break
 
@@ -21,10 +23,10 @@ Install-Module -name xPSDesiredStateConfiguration -force
 Invoke-Command -ComputerName $ComuterName {Install-Module -name xPSDesiredStateConfiguration -force}
 
 # Create HTTPS Pull server configuration with ThumbPrint
-ISE .\1.Config_Pullserver_HA.ps1
+&$editor '.\1.Config_Pullserver_HA.ps1'
 
 # Configure LCM if needed -- I like too.
-ISE .\2.LCM_Settings.ps1
+&$editor '.\2.LCM_Settings.ps1'
 Set-DscLocalConfigurationManager -ComputerName s1,s2 -Path .\ -Verbose
 
 # Deploy HTTPS Pull Server

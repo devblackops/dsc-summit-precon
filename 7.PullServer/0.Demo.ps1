@@ -1,5 +1,7 @@
 ﻿# 1. Set directory location for demo files
-Set-Location -Path C:\Scripts\DSCPreCon\7.PullServer
+$editor=&{ if (get-command -Name code-insiders.cmd) { 'code-insiders.cmd' } else { 'ISE' }}
+
+Set-Location -Path $PSScriptRoot
 Remove-Item -Path .\*.mof -Force
 Remove-DnsServerResourceRecord -ComputerName dc.company.pri -ZoneName company.pri -Name DSC -RRType 'A' -Force
 Break
@@ -36,13 +38,13 @@ Install-Module -name xPSDesiredStateConfiguration, xWebAdministration -force
 Invoke-Command -ComputerName dc {Install-Module -name xPSDesiredStateConfiguration, xWebAdministration -force}
 
 # Check out the documentation - specifically
-ISE 'C:\Program Files\WindowsPowerShell\Modules\xPSDesiredStateConfiguration\3.8.0.0\Examples\Sample_xDscWebService.ps1'
+&$editor 'C:\Program Files\WindowsPowerShell\Modules\xPSDesiredStateConfiguration\3.8.0.0\Examples\Sample_xDscWebService.ps1'
 
 # Create HTTPS Pull server configuration with ThumbPrint
-ISE .\1.Config_Pullserver.ps1
+&$editor '.\1.Config_Pullserver.ps1'
 
 # Configure LCM if needed -- I like too.
-ISE .\2.LCM_Settings.ps1
+&$editor '.\2.LCM_Settings.ps1'
 Set-DscLocalConfigurationManager -ComputerName dc.company.pri -Path .\ -Verbose
 
 # Deploy HTTPS Pull Server

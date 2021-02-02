@@ -1,19 +1,21 @@
 ﻿# 1. Set directory location for demo files
-Set-Location -Path C:\Scripts\DSCPreCon\6.AdvConfig
+$editor=&{ if (get-command -Name code-insiders.cmd) { 'code-insiders.cmd' } else { 'ISE' }}
+
+Set-Location -Path $PSScriptRoot
 Remove-Item -path 'C:\Program Files\WindowsPowerShell\Modules\CompositeDemo' -Recurse -Force
 Remove-Item .\CompositeDemo -Recurse -Force
 Remove-Item -Path .\*.mof -Force
 Break
 
 # Seperating Configuration data from the config
-ISE .\1.RegularConfig.ps1
-ISE .\2.ConfigDataConfig.ps1
+&$editor '.\1.RegularConfig.ps1'
+&$editor '.\2.ConfigDataConfig.ps1'
 
 # Nested configurations
-ISE .\3.Nested.ps1
+&$editor '.\3.Nested.ps1'
 
 # Composite Resources - Start with a config with no node
-ISE .\4.Config_Base.ps1
+&$editor '.\4.Config_Base.ps1'
 
 # Then, create a folder and copy to BaseConfig.schema.PSM1
 # Note - This uses the old folder structure for Resources
@@ -36,7 +38,7 @@ Explorer 'C:\Program Files\WindowsPowerShell\Modules'
 Get-DscResource
 
 # Create a configuration using the composite resource
-ise .\5.WebConfig.ps1
+&$editor '.\5.WebConfig.ps1'
 
 
 # Partial Configs -- here's the concept
